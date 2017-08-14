@@ -33,11 +33,7 @@
 
 #ifndef MCU_PWM_H
 #define MCU_PWM_H
-/** \brief Header para MCU
- **
- ** archivo de inicilizaciÃ³n del microcontrolador
- **
- **/
+
 
 /** \addtogroup PASE_APP_EXAMPLE
  ** @{ */
@@ -60,14 +56,21 @@ extern "C" {
 /*==================[external data declaration]==============================*/
 
 /*==================[external functions declaration]=========================*/
+/**
+ ** Inicializacion del Modulo de Soft de PWM
+ **/
 extern void mcu_pwm_init(void);
-extern void mcu_pwm_config(mcu_gpio_pinid_enum pin, uint32_t period);
-extern void mcu_gpio_setOut(mcu_gpio_pinId_enum id, bool state);
-extern void mcu_gpio_toggleOut(mcu_gpio_pinId_enum id);
-extern bool mcu_gpio_readPin(mcu_gpio_pinId_enum id);
-extern int32_t mcu_gpio_setEventInput(mcu_gpio_pinId_enum id,
-                                      mcu_gpio_eventTypeInput_enum evType,
-                                      mcu_gpio_eventInput_callBack_type cb);
+
+/**
+ ** Permite Configurar el pin y el período en ms
+ **/
+extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period);
+
+/**
+ ** Modifica la relacion entre el tiempo en que esta en alto el pin y el que esta en bajo
+ **/
+extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty);
+
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }
