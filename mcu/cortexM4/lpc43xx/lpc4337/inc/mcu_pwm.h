@@ -89,7 +89,7 @@ typedef struct{
 
 typedef enum {PWM3, PWM0, PWM7, PWM4, PWM9, PWM8,
 	          PWM10, PWM6, PWM2=10, PWM1=12, PWM5=13} mcu_gpio_pinId_enum;
-};
+
 
 /*==================[external data declaration]==============================*/
 

@@ -34,12 +34,45 @@
 #include "mcu_pwm.h"
 #include "chip.h"
 
-extern void mcu_pwn_init(void){}
+/*
+ * Se consultó documento : How to use SCT (State Configuration Timer) as a standard PWM using LPCOpen?
+ * https://community.nxp.com/thread/388765
+ *
+ */
+
+extern void mcu_pwn_init(void){
+	Chip_SCTPWM_Init(LPC_SCT);
+}
 
 
-extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period){}
+/*
+ * Se consultó documento : How to use SCT (State Configuration Timer) as a standard PWM using LPCOpen?
+ * https://community.nxp.com/thread/388765
+ *
+ * 1. Initialize the SCT using Chip_SCTPWM_Init()
+ * 2. Set up the frequency/rate of SCT using Chip_SCTPWM_SetRate()
+ * 3. Configure PinMUX for the pin (SCT_OUTx) [x is the SCT_OUT pin number, see Chip User Manual SCT section for more information]
+ * 4. Assign a PWM output pin to a channel using Chip_SCTPWM_SetOutPin()
+ *
+ */
 
+extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period){
+	Chip_SCTPWM_Init(LPC_SCT);
+	Chip_SCTPWM_SetRate(LPC_SCT, period);
+	Chip_SCU_PinMux(SCTdataList[pin].port, SCTdataList[pin].pin, SCU_MODE_FUNC1, FUNC1);
+	Chip_SCTPWM_SetOutPin(LPC_SCT, pin+1, pin);
+}
 
-extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty){}
+/*
+ * Se consultó documento : How to use SCT (State Configuration Timer) as a standard PWM using LPCOpen?
+ * https://community.nxp.com/thread/388765
+ *
+ * 8. Change the duty-cycle as required using Chip_SCTPWM_SetDutyCycle()
+ *
+ */
+
+extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty){
+    Chip_SCTPWM_SetDutyCycle(LPC_SCT, pin+1, Chip_SCTPWM_PercentajeToTicks(LPC_SCT, duty));
+}
 
 
