@@ -75,4 +75,10 @@ extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty){
     Chip_SCTPWM_SetDutyCycle(LPC_SCT, pin+1, Chip_SCTPWM_PercentajeToTicks(LPC_SCT, duty));
 }
 
+extern void mcu_pwm_iniciar(void){
+	/**
+	 ** Firmware\externals\drivers\cortexM4\lpc43xx\inc\sct_pwm_18xx_43xx.h
+	 **/
+	Chip_SCTPWM_Start(LPC_SCT);
+	}
 

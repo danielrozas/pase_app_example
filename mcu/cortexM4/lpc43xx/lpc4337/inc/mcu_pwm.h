@@ -155,6 +155,15 @@ extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period);
  **/
 extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty);
 
+
+/**
+ ** Inicia el SCT PWM se debe utilizar luego de haber configurado el SCT
+ **
+ ** Firmware\externals\drivers\cortexM4\lpc43xx\inc\sct_pwm_18xx_43xx.h
+ **/
+
+extern void mcu_pwm_iniciar(void);
+
 /*==================[cplusplus]==============================================*/
 #ifdef __cplusplus
 }

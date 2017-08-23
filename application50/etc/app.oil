@@ -56,6 +56,17 @@ OSEK OSEK {
 
    APPMODE = AppMode1;
 
+/*****************************************************************************/
+/* TASK InitTask                                                             */
+/*                                                                           */
+/* ACTIVATION = 1 : Numero maximo de pedidos de activacion en cola para la   */
+/*                  tarea. Un valor igual a 1 indica que solo una activacion */
+/*                  es permitida para la tarea                               */
+/* AUTOSTART = TRUE : La tarea se ejecuta durante el procedimiento de inicio */
+/* TYPE = EXTENDED : Puede tener uno o mas eventos                           */
+/* SCHEDULE = NON : La Tarea no puede ser interrumpida                       */
+/*****************************************************************************/
+
    TASK InitTask {
       PRIORITY = 10;
       ACTIVATION = 1;
