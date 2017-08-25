@@ -78,6 +78,39 @@ OSEK OSEK {
       SCHEDULE = NON;
    }
 
+	TASK TimeCountTask {
+		PRIORITY = 3;
+		ACTIVATION = 1;
+		AUTOSTART = FALSE;
+		STACK = 512;
+		TYPE = BASIC;
+		SCHEDULE = FULL;
+	}
+	
+	TASK Pwm {
+		PRIORITY = 3;
+		ACTIVATION = 1;
+		AUTOSTART = FALSE;
+		STACK = 512;
+		TYPE = EXTENDED;
+		SCHEDULE = NON;
+	}
+
+	TASK Prueba {
+		PRIORITY = 3;
+		ACTIVATION = 1;
+		AUTOSTART = TRUE {
+			APPMODE = AppMode1;
+		}
+		STACK = 1024;
+		TYPE = EXTENDED;
+		SCHEDULE = NON;
+	}
+	
+	
+
+	
+
    TASK InputEvTask1 {
       PRIORITY = 2;
       ACTIVATION = 1;
@@ -93,6 +126,50 @@ OSEK OSEK {
       TYPE = BASIC;
       SCHEDULE = NON;
    }
+
+
+/*****************************************************************************/
+/* ALARM ActivateTimeCountTask                                               */
+/*                                                                           */
+/*       COUNTER = HardwareCounter : Define el contador asignado a esta      */
+/*                 Alarma                                                    */
+/*       ACTION = ACTIVATETASK : Define que tipo de notificacion es usada    */
+/*                cuando la alarma expira. En este caso la tarea que será    */
+/*                activada cuando la alarma expira                           */
+/*       AUTOSTART = FALSE : Define si una alarma es iniciada automaticamente*/
+/*                           cuando se inicia el sistema dependiendo del     */
+/*                           modo de aplicacion                              */
+/*                                                                           */
+/*****************************************************************************/
+
+	ALARM ActivateTimeCountTask {
+		COUNTER = HardwareCounter;
+		ACTION = ACTIVATETASK {
+			TASK = TimeCountTask;
+      	}
+		AUTOSTART = FALSE;
+   	}
+   	
+	ALARM ActivatePwm {
+		COUNTER = HardwareCounter;
+		ACTION = ACTIVATETASK {
+			TASK = Pwm;
+		}
+		AUTOSTART = FALSE;		
+	}
+	
+	   	
+/*****************************************************************************/
+/* COUNTER HardwareCounter                                                   */
+/*                                                                           */
+/*         MAXALLOWEDVALUE = 1000 : Maximo Valor del Contador                */
+/*         TICKSPERBASE = 1 : El numero de ticks requeridos para alcanzar    */
+/*                            una unidad de contador específica.             */
+/*         MINCYCLE = 1 : Especifica el numero minimo permitido de counter de*/
+/*                        ticks para una alarma ciclica enlazada al contador */
+/*         TYPE = HARDWARE : hardware/software tick source for alarms        */
+/*                                                                           */
+/*****************************************************************************/
 
    COUNTER HardwareCounter {
       MAXALLOWEDVALUE = 1000;

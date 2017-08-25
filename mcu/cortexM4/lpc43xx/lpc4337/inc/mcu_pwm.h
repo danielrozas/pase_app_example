@@ -84,11 +84,11 @@ typedef struct{
  * PWM6 --> CTOUT_7
  * PWM2 --> CTOUT_10
  * PWM1 --> CTOUT_12
- *  PWM5 --> CTOUT_13
+ * PWM5 --> CTOUT_13
  */
 
 typedef enum {PWM3, PWM0, PWM7, PWM4, PWM9, PWM8,
-	          PWM10, PWM6, PWM2=10, PWM1=12, PWM5=13} mcu_gpio_pinId_enum;
+	          PWM10, PWM6, PWM2=10, PWM1=12, PWM5=13} mcu_pwm_pinId_enum;
 
 
 /*==================[external data declaration]==============================*/
@@ -101,21 +101,21 @@ typedef enum {PWM3, PWM0, PWM7, PWM4, PWM9, PWM8,
  */
 static pinConfigLpc4337_t SCTdataList[] =
 {
-/* Sct n° | port | pin | name in board */
-/* CTOUT0 */ { 4 , 2 }, /* T_FIL2 */
-/* CTOUT1 */ { 4 , 1 }, /* T_FIL1 */
-/* CTOUT2 */ { 2 , 10 }, /* LED1 (also for LCD1) */
-/* CTOUT3 */ { 4 , 3 }, /* T_FIL3 */
-/* CTOUT4 */ { 2 , 12 }, /* LED3 (also for LCD3) */
-/* CTOUT5 */ { 2 , 11 }, /* LED2 (also for LCD2) */
-/* CTOUT6 */ { 6 , 5 }, /* GPIO2 */
-/* CTOUT7 */ { 6 , 12 }, /* GPIO8 */
-/* CTOUT8 */ { 1 , 3 }, /* MDC / SPI_MISO */
-/* CTOUT9 */ { 1 , 4 }, /* SPI_MOSI */
-/* CTOUT10 */ { 1 , 5 }, /* T_COL0 */
-/* CTOUT11 */ { 0 , 0 }, /* DO NOT USE */
-/* CTOUT12 */ { 7 , 5 }, /* T_COL2 */
-/* CTOUT13 */ { 7 , 4 } /* T_COL1 */
+/*           Sct n°     | port | pin | name in board */
+/* SCT output 0 - CTOUT0 */ { 4 , 2 }, /* T_FIL2 */
+/* SCT output 1 - CTOUT1 */ { 4 , 1 }, /* T_FIL1 */
+/* SCT output 2 - CTOUT2 */ { 2 , 10 }, /* LED1 (also for LCD1) */
+/* SCT output 3 - CTOUT3 */ { 4 , 3 }, /* T_FIL3 */
+/* SCT output 4 - CTOUT4 */ { 2 , 12 }, /* LED3 (also for LCD3) */
+/* SCT output 5 - CTOUT5 */ { 2 , 11 }, /* LED2 (also for LCD2) */
+/* SCT output 6 - CTOUT6 */ { 6 , 5 }, /* GPIO2 */
+/* SCT output 7 - CTOUT7 */ { 6 , 12 }, /* GPIO8 */
+/* SCT output 8 - CTOUT8 */ { 1 , 3 }, /* MDC / SPI_MISO */
+/* SCT output 9 - CTOUT9 */ { 1 , 4 }, /* SPI_MOSI */
+/* SCT output 10 - CTOUT10 */ { 1 , 5 }, /* T_COL0 */
+/* SCT output 11 - CTOUT11 */ { 0 , 0 }, /* DO NOT USE */
+/* SCT output 12 - CTOUT12 */ { 7 , 5 }, /* T_COL2 */
+/* SCT output 13 - CTOUT13 */ { 7 , 4 } /* T_COL1 */
 };
 
 
@@ -148,12 +148,12 @@ extern void mcu_pwm_init(void);
 /**
  ** Permite Configurar el pin y el período en ms
  **/
-extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period);
+extern void mcu_pwm_config(mcu_pwm_pinId_enum pin, uint32_t period);
 
 /**
  ** Modifica la relacion entre el tiempo en que esta en alto el pin y el que esta en bajo
  **/
-extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty);
+extern void mcu_pwm_setDutyCicle(mcu_pwm_pinId_enum pin, uint32_t duty);
 
 
 /**

@@ -97,3 +97,20 @@ void uartWriteString( uartMap_t uart, char* str ){
 	  str++;
    }
 }
+
+
+void uartWriteByte( uartMap_t uart, uint8_t byte ){
+
+   switch(uart){
+   case UART_USB:
+      while ((Chip_UART_ReadLineStatus(UART_USB_LPC) & UART_LSR_THRE) == 0) {}   // Wait for space in FIFO
+      Chip_UART_SendByte(UART_USB_LPC, byte);
+   break;
+   case UART_232:
+      while ((Chip_UART_ReadLineStatus(UART_232_LPC) & UART_LSR_THRE) == 0) {}   // Wait for space in FIFO
+      Chip_UART_SendByte(UART_232_LPC, byte);
+   break;
+   case UART_485:
+   break;
+   }
+}

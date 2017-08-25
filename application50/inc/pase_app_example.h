@@ -46,10 +46,16 @@
  ** @{ */
 
 /*==================[inclusions]=============================================*/
+#include "stdint.h"
+#include "mcu_pwm.h"
 
 /*==================[macros]=================================================*/
 
 /*==================[typedef]================================================*/
+/* typedef enum {ROJO = PWM7, VERDE = PWM8, AZUL = PWM9} led_color;          */
+
+typedef enum {ROJO = 2, VERDE = 5, AZUL = 4} led_color;
+
 
 /*==================[external data declaration]==============================*/
 

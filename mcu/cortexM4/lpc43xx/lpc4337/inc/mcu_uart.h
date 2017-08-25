@@ -61,3 +61,13 @@ void mcu_uart_config( uartMap_t uart, uint32_t baudRate );
  */
 
 void uartWriteString( uartMap_t uart, char* str );
+
+
+/*
+ * Funcion tomada de firmware_v2\modules\lpc4337_m4\sapi\inc\sapi_uart.h
+ *
+ *
+ */
+
+void uartWriteByte( uartMap_t uart, uint8_t byte );
+

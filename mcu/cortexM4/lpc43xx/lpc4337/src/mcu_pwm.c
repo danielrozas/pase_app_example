@@ -56,7 +56,7 @@ extern void mcu_pwn_init(void){
  *
  */
 
-extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period){
+extern void mcu_pwm_config(mcu_pwm_pinId_enum pin, uint32_t period){
 	Chip_SCTPWM_Init(LPC_SCT);
 	Chip_SCTPWM_SetRate(LPC_SCT, period);
 	Chip_SCU_PinMux(SCTdataList[pin].port, SCTdataList[pin].pin, SCU_MODE_FUNC1, FUNC1);
@@ -71,8 +71,9 @@ extern void mcu_pwm_config(mcu_gpio_pinId_enum pin, uint32_t period){
  *
  */
 
-extern void mcu_pwm_setDutyCicle(mcu_gpio_pinId_enum pin, uint32_t duty){
-    Chip_SCTPWM_SetDutyCycle(LPC_SCT, pin+1, Chip_SCTPWM_PercentajeToTicks(LPC_SCT, duty));
+extern void mcu_pwm_setDutyCicle(mcu_pwm_pinId_enum pin, uint32_t duty){
+
+	Chip_SCTPWM_SetDutyCycle(LPC_SCT, pin + 1, Chip_SCTPWM_PercentageToTicks(LPC_SCT, duty));
 }
 
 extern void mcu_pwm_iniciar(void){
