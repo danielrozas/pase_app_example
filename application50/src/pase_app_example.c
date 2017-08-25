@@ -47,14 +47,40 @@
 #include "os.h"
 #include "pase_app_example.h"
 #include "bsp.h"
-#include "mcu.h"
+#include "mcu_pwm.h"
+
+/**
+ *
+ * #include "mcu.h"
+ */
+
+
+#include "mcu_pwm.h"
+#include "mcu_uart.h"
+#include "mcu_gpio.h"
 
 /*==================[macros and definitions]=================================*/
 #define FIRST_START_DELAY_MS 350
 #define PERIOD_MS 250
 
 #define BAUD_RATE 115200
+
+#define INCREMENTTICKS 0
+#define CYCLEVALUE 10
+
+
+#define PWM_INC 10
+#define PWM_MAX_DUTY 100
+
+#define PERIODO 2000
 /*==================[internal data declaration]==============================*/
+
+static uint32_t ContadorTiempo;
+/* static uint32_t ContadorDutyCiclo; */
+
+uint32_t ContadorDutyCiclo;
+
+static led_color led_color_a_encender;
 
 /*==================[internal functions declaration]=========================*/
 
@@ -96,7 +122,7 @@ int main(void)
 
 /** \brief Error Hook function
  *
- * This fucntion is called from the os if an os interface (API) returns an
+ * This function is called from the os if an os interface (API) returns an
  * error. Is for debugging proposes. If called this function triggers a
  * ShutdownOs which ends in a while(1).
  *
@@ -141,24 +167,79 @@ TASK(InitTask)
 
    mcu_uart_config(UART_USB, BAUD_RATE);
 
+   ContadorTiempo=0;
+
+    /**
+     * Debo iniciar el contador de tiempo que me dará el TimeStamp
+     * SetRelAlarm ( AlarmType <AlarmID>, TickType <increment>, TickType <cycle> )
+     *
+     * Parameter (In):
+     *                AlarmID : Reference to the alarm element
+     *                increment : Relative value in ticks
+     *                cycle : Cycle value in case of cyclic alarm. In case of single alarms, cycle shall be zero.
+     */
+
+    SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
+
+   ContadorDutyCiclo = 0;
+
    mcu_pwm_iniciar();
 
    TerminateTask();
 }
 
+TASK(TimeCountTask){
+   ContadorTiempo=ContadorTiempo+1;
+   TerminateTask();
+}
+
+
+TASK(Pwm){
+
+	/*
+	 *  Incremento el Duty Cycle
+	 */
+
+
+	ContadorDutyCiclo += PWM_INC;
+
+	if (ContadorDutyCiclo > PWM_MAX_DUTY) {
+		ContadorDutyCiclo = 0;
+			}
+
+	/*
+	 * led_color_a_encender=VERDE;
+	 */
+
+
+	mcu_pwm_setDutyCicle((mcu_pwm_pinId_enum) 2, ContadorDutyCiclo);
+
+
+}
+
+TASK(Prueba){
+
+	SetRelAlarm(ActivatePwm, 0, PERIODO);
+}
+
 TASK(InputEvTask1)
 {
-   bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
+   /*
+    * bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
+    */
 
    TerminateTask();
 }
 
 TASK(InputEvTask2)
 {
-   bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
+   /*
+   * bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
+   */
 
    TerminateTask();
 }
+
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
