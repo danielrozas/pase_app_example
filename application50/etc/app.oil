@@ -44,8 +44,8 @@
 OSEK OSEK {
 
    OS	ExampleOS {
-      STATUS = EXTENDED;
-      ERRORHOOK = TRUE;
+      STATUS = EXTENDED;			// sistema con status : extended (otro valor = STANDARD)
+      ERRORHOOK = TRUE;				// OSEK hooks (valor = TRUE or FALSE)
       PRETASKHOOK = FALSE;
       POSTTASKHOOK = FALSE;
       STARTUPHOOK = FALSE;
@@ -55,6 +55,13 @@ OSEK OSEK {
    };
 
    APPMODE = AppMode1;
+
+/*****************************************************************************/
+/* EVENTOS                                                                   */
+/*****************************************************************************/
+
+EVENT=eventoInicioFin
+EVENT=eventoPausaReinicia
 
 /*****************************************************************************/
 /* TASK InitTask                                                             */
@@ -96,35 +103,30 @@ OSEK OSEK {
 		SCHEDULE = NON;
 	}
 
-	TASK Prueba {
-		PRIORITY = 3;
-		ACTIVATION = 1;
-		AUTOSTART = TRUE {
-			APPMODE = AppMode1;
-		}
-		STACK = 1024;
-		TYPE = EXTENDED;
-		SCHEDULE = NON;
-	}
-	
-	
-
-	
-
-   TASK InputEvTask1 {
+   TASK TareaInicioFin {
       PRIORITY = 2;
-      ACTIVATION = 1;
+      ACTIVATION = 1;				// Numero maximo de pedidos de activacion en cola para la activacion
+      AUTOSTART = TRUE {			// La tarea se activa en el startup
+         APPMODE = AppMode1;
+      }
       STACK = 512;
-      TYPE = BASIC;
-      SCHEDULE = NON;
+      TYPE = EXTENDED;				// La tarea puede esperar la ocurrencia de uno o mas eventos
+      EVENT = eventoInicioFin		// La tarea reaccionará ante el evento eventoInicioFin
+                                    // usando TEC_1
+      SCHEDULE = NON;				// La tarea no puede ser interrumpida
    }
 
-   TASK InputEvTask2 {
+   TASK TareaPausaReinicia {
       PRIORITY = 2;
-      ACTIVATION = 1;
+      ACTIVATION = 1;				// Numero maximo de pedidos de activacion en cola para la activacion
+      AUTOSTART = TRUE {			// La tarea se activa en el startup
+         APPMODE = AppMode1;
+      }      
       STACK = 512;
-      TYPE = BASIC;
-      SCHEDULE = NON;
+      TYPE = EXTENDED;				// La tarea puede esperar la ocurrencia de uno o mas eventos
+      EVENT = eventoPausaReinicia	// La tarea reaccionará ante el evento eventoPausaReinicia
+                                    // usando TEC_2
+      SCHEDULE = NON;				// La tarea no puede ser interrumpida
    }
 
 

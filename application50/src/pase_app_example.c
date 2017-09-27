@@ -91,12 +91,12 @@ static led_color led_color_a_encender;
 /*==================[internal functions definition]==========================*/
 static void eventInput1_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
 {
-   ActivateTask(InputEvTask1);
+   ActivateTask(eventoInicioFin);
 }
 
 static void eventInput2_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
 {
-   ActivateTask(InputEvTask2);
+   ActivateTask(eventoPausaReinicia);
 }
 
 /*==================[external functions definition]==========================*/
@@ -151,10 +151,19 @@ TASK(InitTask)
 {
    bsp_init();
 
+
+   /**
+    * Setea la tecla (TEC_1) , tipo de evento : Flanco Descendente y
+    * evento que se disparará
+    */
    mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_38,
          MCU_GPIO_EVENT_TYPE_INPUT_FALLING_EDGE,
          eventInput1_callBack);
 
+   /**
+    * Setea la tecla (TEC_2) , tipo de evento : Flanco Ascendente y
+    * evento que se disparará
+    */
    mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_42,
          MCU_GPIO_EVENT_TYPE_INPUT_RISING_EDGE,
          eventInput2_callBack);
@@ -217,25 +226,29 @@ TASK(Pwm){
 
 }
 
-TASK(Prueba){
 
-	SetRelAlarm(ActivatePwm, 0, PERIODO);
-}
+/*
+ * TASK(InicioFin){
+ *
+ *	SetRelAlarm(ActivatePwm, 0, PERIODO);
+ * }
+ */
 
-TASK(InputEvTask1)
+
+TASK(TareaInicioFin)
 {
-   /*
-    * bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
-    */
+
+    bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
+
 
    TerminateTask();
 }
 
-TASK(InputEvTask2)
+TASK(TareaPausaReinicia)
 {
-   /*
-   * bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
-   */
+
+   bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
+
 
    TerminateTask();
 }
