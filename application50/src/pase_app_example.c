@@ -91,12 +91,12 @@ static led_color led_color_a_encender;
 /*==================[internal functions definition]==========================*/
 static void eventInput1_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
 {
-   ActivateTask(eventoInicioFin);
+	SetEvent(TareaInicioFin, eventoInicioFin);
 }
 
 static void eventInput2_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
 {
-   ActivateTask(eventoPausaReinicia);
+	SetEvent(TareaPausaReinicia, eventoPausaReinicia);
 }
 
 /*==================[external functions definition]==========================*/
@@ -154,7 +154,7 @@ TASK(InitTask)
 
    /**
     * Setea la tecla (TEC_1) , tipo de evento : Flanco Descendente y
-    * evento que se disparará
+    * la funcion de CallBack que será ejecutada
     */
    mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_38,
          MCU_GPIO_EVENT_TYPE_INPUT_FALLING_EDGE,
@@ -162,7 +162,7 @@ TASK(InitTask)
 
    /**
     * Setea la tecla (TEC_2) , tipo de evento : Flanco Ascendente y
-    * evento que se disparará
+    * la funcion de CallBack que será ejecutada
     */
    mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_42,
          MCU_GPIO_EVENT_TYPE_INPUT_RISING_EDGE,
@@ -237,20 +237,46 @@ TASK(Pwm){
 
 TASK(TareaInicioFin)
 {
+/*
+ * La Tarea TareaInicioFin espera por un evento : "WaitEvent(eventoInicioFin)".
+ * eventInput1_callBack setea este evento para TareaInicioFin. El scheduler es activado.
+ * Por lo tanto TareaInicioFin es transferida del estado "waiting" al estado "ready".
+ * Debido a la mayor prioridad de TareaInicioFin resulta en un cambio de tarea y TareaInicioFin
+ * tiene preferencia.
+ * La tarea TareaInicioFin resetea el evento : "ClearEvent(eventoInicioFin)"
+ * Por lo tanto TareaInicioFin queda en waiting nuevamente a la espera de este evento nuevamente
+ * y el scheduler continua con la ejecución de otra tarea
+ *
+ */
+	WaitEvent(eventoInicioFin);
+	ClearEvent(eventoInicioFin);
 
     bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
 
-
-   TerminateTask();
+	WaitEvent(eventoInicioFin);
 }
 
 TASK(TareaPausaReinicia)
 {
+	/*
+	 * La Tarea TareaPausaReinicia espera por un evento : "WaitEvent(eventoPausaReinicia)".
+	 * eventInput2_callBack setea este evento para TareaPausaReinicia. El scheduler es activado.
+	 * Por lo tanto TareaPausaReinicia es transferida del estado "waiting" al estado "ready".
+	 * Debido a la mayor prioridad de TareaPausaReinicia resulta en un cambio de tarea y TareaPausaReinicia
+	 * tiene preferencia.
+	 * La tarea TareaPausaReinicia resetea el evento : "ClearEvent(eventoPausaReinicia)"
+	 * Por lo tanto TareaPausaReinicia queda en waiting nuevamente a la espera de este evento nuevamente
+	 * y el scheduler continua con la ejecución de otra tarea
+	 *
+	 */
 
-   bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
+	WaitEvent(TareaPausaReinicia);
+	ClearEvent(TareaPausaReinicia);
+
+    bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
 
 
-   TerminateTask();
+	WaitEvent(eventoInicioFin);
 }
 
 
