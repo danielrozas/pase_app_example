@@ -227,14 +227,6 @@ TASK(Pwm){
 }
 
 
-/*
- * TASK(InicioFin){
- *
- *	SetRelAlarm(ActivatePwm, 0, PERIODO);
- * }
- */
-
-
 TASK(TareaInicioFin)
 {
 /*
@@ -248,12 +240,12 @@ TASK(TareaInicioFin)
  * y el scheduler continua con la ejecución de otra tarea
  *
  */
-	WaitEvent(eventoInicioFin);
-	ClearEvent(eventoInicioFin);
 
     bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
 
+	ClearEvent(eventoInicioFin);
 	WaitEvent(eventoInicioFin);
+
 }
 
 TASK(TareaPausaReinicia)
@@ -270,12 +262,10 @@ TASK(TareaPausaReinicia)
 	 *
 	 */
 
-	WaitEvent(TareaPausaReinicia);
-	ClearEvent(TareaPausaReinicia);
 
     bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
 
-
+	ClearEvent(TareaPausaReinicia);
 	WaitEvent(eventoInicioFin);
 }
 
