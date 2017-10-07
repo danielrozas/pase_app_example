@@ -101,7 +101,7 @@ OSEK OSEK {
 	}
 
    TASK KeyboardPollingTask {
-      PRIORITY = 4;
+      PRIORITY = 3;
       ACTIVATION = 1;				// Numero maximo de pedidos de activacion en cola para la activacion
       STACK = 512;
       TYPE = BASIC;			    	// La tarea no admite la ocurrencia de eventos

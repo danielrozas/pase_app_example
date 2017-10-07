@@ -143,13 +143,6 @@ TASK(InitTask)
     */
    bsp_init();
 
-   /**
-    * La alarma ActivateKeyboardTask es activada para expirar por primera vez
-    * luego de 10 ticks y luego reiteradamente cada 2 ticks es decir cada 2 ms.
-    */
-   SetRelAlarm(ActivateKeyboardPollingTask, 10, KEYBOARD_TASK_TIME_MS);
-
-
    mcu_pwm_config(2, 1000);
    mcu_pwm_config(5, 1000);
    mcu_pwm_config(4, 1000);
@@ -170,8 +163,19 @@ TASK(InitTask)
      *                cycle : Cycle value in case of cyclic alarm. In case of single alarms, cycle shall be zero.
      */
 
-   //  SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
    SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
+
+   /**
+    * La alarma ActivateKeyboardTask es activada para expirar por primera vez
+    * luego de 10 ticks y luego reiteradamente cada 2 ticks es decir cada 2 ms.
+    */
+   SetRelAlarm(ActivateKeyboardPollingTask, 10, KEYBOARD_TASK_TIME_MS);
+
+   /**
+    * La alarma KeyboardProcessTask es activada para expirar por primera vez
+    * luego de 100 ticks y luego reiteradamente cada 100 ticks es decir cada 100 ms.
+    */
+   SetRelAlarm(ActivateKeyboardProcessTask, 100, 100);
 
    ContadorDutyCiclo = 0;
 
@@ -256,6 +260,10 @@ TASK(KeyboardProcessTask)
 		{
 			mem_status_tec_1 = 1;
 
+    		bsp_ledAction(BOARD_LED_ID_0_R,BOARD_LED_STATE_ON);
+    		bsp_ledAction(BOARD_LED_ID_0_G,BOARD_LED_STATE_ON);
+    		bsp_ledAction(BOARD_LED_ID_0_B,BOARD_LED_STATE_ON);
+
 			sprintf(msg, "TIMESTAMP: Inicio secuencia\n\r");
 			uartWriteString(UART_USB, msg);
 		}
@@ -266,6 +274,10 @@ TASK(KeyboardProcessTask)
 		 */
 		{
 			mem_status_tec_1 = 0;
+
+    		bsp_ledAction(BOARD_LED_ID_0_R,BOARD_LED_STATE_OFF);
+    		bsp_ledAction(BOARD_LED_ID_0_G,BOARD_LED_STATE_OFF);
+    		bsp_ledAction(BOARD_LED_ID_0_B,BOARD_LED_STATE_OFF);
 		}
 
 	}
