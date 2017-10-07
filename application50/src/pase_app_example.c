@@ -47,13 +47,13 @@
 #include "os.h"
 #include "pase_app_example.h"
 #include "bsp.h"
-#include "mcu_pwm.h"
+
+#include <stdio.h>
 
 /**
  *
  * #include "mcu.h"
  */
-
 
 #include "mcu_pwm.h"
 #include "mcu_uart.h"
@@ -80,8 +80,6 @@ static uint32_t ContadorTiempo;
 
 uint32_t ContadorDutyCiclo;
 
-static led_color led_color_a_encender;
-
 /*==================[internal functions declaration]=========================*/
 
 /*==================[internal data definition]===============================*/
@@ -89,15 +87,6 @@ static led_color led_color_a_encender;
 /*==================[external data definition]===============================*/
 
 /*==================[internal functions definition]==========================*/
-static void eventInput1_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
-{
-	SetEvent(TareaInicioFin, eventoInicioFin);
-}
-
-static void eventInput2_callBack(mcu_gpio_pinId_enum id, mcu_gpio_eventTypeInput_enum evType)
-{
-	SetEvent(TareaPausaReinicia, eventoPausaReinicia);
-}
 
 /*==================[external functions definition]==========================*/
 /** \brief Main function
@@ -149,24 +138,17 @@ void ErrorHook(void)
  */
 TASK(InitTask)
 {
+   /**
+    * Inicializa el teclado
+    */
    bsp_init();
 
-
    /**
-    * Setea la tecla (TEC_1) , tipo de evento : Flanco Descendente y
-    * la funcion de CallBack que será ejecutada
+    * La alarma ActivateKeyboardTask es activada para expirar por primera vez
+    * luego de 10 ticks y luego reiteradamente cada 2 ticks es decir cada 2 ms.
     */
-   mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_38,
-         MCU_GPIO_EVENT_TYPE_INPUT_FALLING_EDGE,
-         eventInput1_callBack);
+   SetRelAlarm(ActivateKeyboardPollingTask, 10, KEYBOARD_TASK_TIME_MS);
 
-   /**
-    * Setea la tecla (TEC_2) , tipo de evento : Flanco Ascendente y
-    * la funcion de CallBack que será ejecutada
-    */
-   mcu_gpio_setEventInput(MCU_GPIO_PIN_ID_42,
-         MCU_GPIO_EVENT_TYPE_INPUT_RISING_EDGE,
-         eventInput2_callBack);
 
    mcu_pwm_config(2, 1000);
    mcu_pwm_config(5, 1000);
@@ -188,7 +170,8 @@ TASK(InitTask)
      *                cycle : Cycle value in case of cyclic alarm. In case of single alarms, cycle shall be zero.
      */
 
-    SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
+   //  SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
+   SetRelAlarm(ActivateTimeCountTask, INCREMENTTICKS, CYCLEVALUE);
 
    ContadorDutyCiclo = 0;
 
@@ -227,46 +210,103 @@ TASK(Pwm){
 }
 
 
-TASK(TareaInicioFin)
-{
-/*
- * La Tarea TareaInicioFin espera por un evento : "WaitEvent(eventoInicioFin)".
- * eventInput1_callBack setea este evento para TareaInicioFin. El scheduler es activado.
- * Por lo tanto TareaInicioFin es transferida del estado "waiting" al estado "ready".
- * Debido a la mayor prioridad de TareaInicioFin resulta en un cambio de tarea y TareaInicioFin
- * tiene preferencia.
- * La tarea TareaInicioFin resetea el evento : "ClearEvent(eventoInicioFin)"
- * Por lo tanto TareaInicioFin queda en waiting nuevamente a la espera de este evento nuevamente
- * y el scheduler continua con la ejecución de otra tarea
+/**
  *
- */
-
-    bsp_ledAction(BOARD_LED_ID_1, BSP_LED_ACTION_TOGGLE);
-
-	ClearEvent(eventoInicioFin);
-	WaitEvent(eventoInicioFin);
-
+ * Tarea que barre el teclado cada 2ms
+ *
+ * */
+TASK(KeyboardPollingTask){
+    bsp_keyboard_task();
+    TerminateTask();
 }
 
-TASK(TareaPausaReinicia)
+
+/**
+ *
+ * Tarea que analiza la última tecla leída
+ *
+ * */
+TASK(KeyboardProcessTask)
 {
-	/*
-	 * La Tarea TareaPausaReinicia espera por un evento : "WaitEvent(eventoPausaReinicia)".
-	 * eventInput2_callBack setea este evento para TareaPausaReinicia. El scheduler es activado.
-	 * Por lo tanto TareaPausaReinicia es transferida del estado "waiting" al estado "ready".
-	 * Debido a la mayor prioridad de TareaPausaReinicia resulta en un cambio de tarea y TareaPausaReinicia
-	 * tiene preferencia.
-	 * La tarea TareaPausaReinicia resetea el evento : "ClearEvent(eventoPausaReinicia)"
-	 * Por lo tanto TareaPausaReinicia queda en waiting nuevamente a la espera de este evento nuevamente
-	 * y el scheduler continua con la ejecución de otra tarea
-	 *
+
+	int32_t tecla;
+
+    static uint8_t mem_status_tec_1 = 0;
+    static uint8_t mem_status_tec_2 = 0;
+
+    char msg[50];
+
+	tecla = bsp_keyboardGet();
+
+	/**
+	 * BOARD_TEC_ID_1 está definida en bsp\edu_ciaa_nxp\inc\board.h
 	 */
+	if (tecla == BOARD_TEC_ID_1)
+	{
 
+		/**
+		 * Procedo de acuerdo al status memorizado de TEC_1
+		 *
+		 */
 
-    bsp_ledAction(BOARD_LED_ID_2, BSP_LED_ACTION_TOGGLE);
+		if (mem_status_tec_1 == 0)
+		/**
+		 * Está finalizada la secuencia y se presionó TEC_1 ==> debe arrancar la secuencia
+		 */
+		{
+			mem_status_tec_1 = 1;
 
-	ClearEvent(TareaPausaReinicia);
-	WaitEvent(eventoInicioFin);
+			sprintf(msg, "TIMESTAMP: Inicio secuencia\n\r");
+			uartWriteString(UART_USB, msg);
+		}
+
+		else
+		/**
+		 * Está iniciada la secuencia y se presionó TEC_1 ==> debe finalizar la secuencia
+		 */
+		{
+			mem_status_tec_1 = 0;
+		}
+
+	}
+
+	/**
+	 * BOARD_TEC_ID_2 está definida en bsp\edu_ciaa_nxp\inc\board.h
+	 */
+	if (tecla == BOARD_TEC_ID_2)
+	{
+
+		/**
+		 * Procedo de acuerdo al status memorizado de TEC_2
+		 *
+		 */
+
+		if (mem_status_tec_2 == 0)
+		/**
+		 * Está reanudada la secuencia y se presionó TEC_2 ==> debe pausar la secuencia
+		 */
+		{
+			mem_status_tec_2 = 1;
+
+			sprintf(msg, "TIMESTAMP: Secuencia pausada\n\r");
+			uartWriteString(UART_USB, msg);
+		}
+
+		else
+		/**
+		 * Está pausada la secuencia y se presionó TEC_2 ==> debe reanudar la secuencia
+		 */
+		{
+			mem_status_tec_2 = 0;
+
+			sprintf(msg, "TIMESTAMP: Secuencia reanudada\n\r");
+			uartWriteString(UART_USB, msg);
+
+		}
+
+	}
+
+    TerminateTask();
 }
 
 

@@ -60,9 +60,6 @@ OSEK OSEK {
 /* EVENTOS                                                                   */
 /*****************************************************************************/
 
-EVENT=eventoInicioFin
-EVENT=eventoPausaReinicia
-
 /*****************************************************************************/
 /* TASK InitTask                                                             */
 /*                                                                           */
@@ -103,29 +100,19 @@ EVENT=eventoPausaReinicia
 		SCHEDULE = NON;
 	}
 
-   TASK TareaInicioFin {
-      PRIORITY = 2;
+   TASK KeyboardPollingTask {
+      PRIORITY = 4;
       ACTIVATION = 1;				// Numero maximo de pedidos de activacion en cola para la activacion
-      AUTOSTART = TRUE {			// La tarea se activa en el startup
-         APPMODE = AppMode1;
-      }
       STACK = 512;
-      TYPE = EXTENDED;				// La tarea puede esperar la ocurrencia de uno o mas eventos
-      EVENT = eventoInicioFin		// La tarea reaccionará ante el evento eventoInicioFin
-                                    // usando TEC_1
+      TYPE = BASIC;			    	// La tarea no admite la ocurrencia de eventos
       SCHEDULE = NON;				// La tarea no puede ser interrumpida
    }
 
-   TASK TareaPausaReinicia {
-      PRIORITY = 2;
+   TASK KeyboardProcessTask {
+      PRIORITY = 3;
       ACTIVATION = 1;				// Numero maximo de pedidos de activacion en cola para la activacion
-      AUTOSTART = TRUE {			// La tarea se activa en el startup
-         APPMODE = AppMode1;
-      }      
       STACK = 512;
-      TYPE = EXTENDED;				// La tarea puede esperar la ocurrencia de uno o mas eventos
-      EVENT = eventoPausaReinicia	// La tarea reaccionará ante el evento eventoPausaReinicia
-                                    // usando TEC_2
+      TYPE = BASIC;			    	// La tarea no admite la ocurrencia de eventos
       SCHEDULE = NON;				// La tarea no puede ser interrumpida
    }
 
@@ -160,7 +147,52 @@ EVENT=eventoPausaReinicia
 		AUTOSTART = FALSE;		
 	}
 	
-	   	
+/*****************************************************************************/
+/* ALARM ActivateKeyboardPollingTask                                         */
+/*                                                                           */
+/*       COUNTER = HardwareCounter : Define el contador asignado a esta      */
+/*                 Alarma                                                    */
+/*       ACTION = ACTIVATETASK : Define que tipo de notificacion es usada    */
+/*                cuando la alarma expira. En este caso la tarea que será    */
+/*                activada cuando la alarma expira                           */
+/*       AUTOSTART = FALSE : Define si una alarma es iniciada automaticamente*/
+/*                           cuando se inicia el sistema dependiendo del     */
+/*                           modo de aplicacion                              */
+/*                                                                           */
+/*****************************************************************************/
+
+   	ALARM ActivateKeyboardPollingTask {
+    	COUNTER = HardwareCounter;
+      	ACTION = ACTIVATETASK {
+        	TASK = KeyboardPollingTask;
+      	}
+      	AUTOSTART = FALSE;		
+   	}
+   	
+   		   	
+/*****************************************************************************/
+/* ALARM ActivateKeyboardProcessTask                                         */
+/*                                                                           */
+/*       COUNTER = HardwareCounter : Define el contador asignado a esta      */
+/*                 Alarma                                                    */
+/*       ACTION = ACTIVATETASK : Define que tipo de notificacion es usada    */
+/*                cuando la alarma expira. En este caso la tarea que será    */
+/*                activada cuando la alarma expira                           */
+/*       AUTOSTART = FALSE : Define si una alarma es iniciada automaticamente*/
+/*                           cuando se inicia el sistema dependiendo del     */
+/*                           modo de aplicacion                              */
+/*                                                                           */
+/*****************************************************************************/
+
+   	ALARM ActivateKeyboardProcessTask {
+    	COUNTER = HardwareCounter;
+      	ACTION = ACTIVATETASK {
+        	TASK = KeyboardProcessTask;
+      	}
+      	AUTOSTART = FALSE;		
+   	}
+   	
+   		   	
 /*****************************************************************************/
 /* COUNTER HardwareCounter                                                   */
 /*                                                                           */
